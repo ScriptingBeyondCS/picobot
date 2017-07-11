@@ -129,7 +129,7 @@ def getsurr(picomap, i, j):
     except: out += 0
     return out
 
-def reset():
+def reset(given_map=None):
     """ resets board
     """
     global pmap
@@ -140,7 +140,11 @@ def reset():
     stop = True
     unvisit()
     picostate = '00'
-    pmap[i,j] = 1  # remove old location of picobot
+    if type(given_map) == 'NoneType':
+        pmap[i,j] = 1  # remove old location of picobot    
+    else:
+        pmap[i,j] = given_map[i,j] # keep wall/nonwall of new map
+    
     i, j = place_picobot()
     pmap[i,j] = 2 # set new location of picobot
     mat.set_data(pmap)
@@ -202,7 +206,7 @@ def on_keypress(event):
         stop = True
         index = int(event.key)
         pmap = map_options[index]
-        reset()
+        reset(given_map = pmap)
         mat.set_data(pmap)
         return [mat]
         
