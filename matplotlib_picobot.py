@@ -6,11 +6,12 @@ import matplotlib.animation as animation
 from matplotlib import colors
 from random import choice
 from maps import *
+from rules import *
 
 #get map, rules, etc. ...
 pmap = maptions[1]
 
-rules = ['001***N00','000*1*W01', '000*0*E02', '0201**E02', '0200**S01', '01***1S01', '01***0X00']
+rules = maze_rules
 
 #randomly place picobot
 def place_picobot():
@@ -140,7 +141,7 @@ def reset(given_map=None):
     stop = True
     unvisit()
     picostate = '00'
-    if type(given_map) == 'NoneType':
+    if type(given_map) == type(None):
         pmap[i,j] = 1  # remove old location of picobot    
     else:
         pmap[i,j] = given_map[i,j] # keep wall/nonwall of new map
