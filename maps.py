@@ -219,7 +219,7 @@ map6 =[ [ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ],
         [ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1 ],
         [ 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 ] ]
 
-map_options = [emptymap2, emptymap, diamondmap, mazemap, map3, map4, map5, map6]
+map_options = [emptymap2, emptymap, mazemap, diamondmap, map3, map4, map5, map6]
 for i in range(8):
     for k in range(len(map_options[i])):
         for j in range(len(map_options[i][k])):
