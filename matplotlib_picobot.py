@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib.offsetbox import AnchoredOffsetbox, TextArea, AnchoredText
+from matplotlib.offsetbox import AnchoredText
 from matplotlib import colors
 from random import choice
 
@@ -18,12 +18,12 @@ def get_rules(filename):
     f.close()
     return rules_list
 
-#########################################################
-#########################################################
+##############################################################
+##############################################################
 #insert here the name of the file where your rules are written
 rule_list = get_rules('hw0pr4.txt') 
-#########################################################
-#########################################################
+##############################################################
+##############################################################
 
 class Picobot:
     
@@ -47,15 +47,14 @@ class Picobot:
         """ randomly places picobot in
         a valid (nonwall) location
         """
-        i = choice(range(len(self.pmap)))
-        j = choice(range(len(self.pmap[i])))
-        while self.pmap[i,j] == 0: #check if picobot is in a wall
-            # i know this is a potentially infinite loop im sorry
-            i = choice(range(len(self.pmap)))
-            j = choice(range(len(self.pmap[i])))
-        self.i = i
-        self.j = j
-    
+        # all walls are represented by zero
+        # so places that are not zero are not a wall
+        notwalls = np.transpose(self.pmap.nonzero())
+        notwalls = notwalls.tolist()
+        loc = choice(range(len(notwalls)))
+        self.i = notwalls[loc][0]
+        self.j = notwalls[loc][1]
+        
     def update(self, data):
         if self.isFinished() or self.stop:
             cid3 = fig.canvas.mpl_connect('key_press_event', self.on_step)
