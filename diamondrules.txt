@@ -1,0 +1,34 @@
+#go up til you hit a wall
+100 x*** -> N 0
+0 NExS -> W 5
+0 NExx -> X 1
+0 Nx** -> X 1
+#downleft
+1 ***x -> S 2
+2 **x* -> W 1
+1 ***S -> E 3
+#2 **W* -> N 4 
+#do we need this^ rule?
+#rightup
+3 *x** -> E 4
+4 x*** -> N 3
+#3 *E** -> W 1
+4 N**x -> S 2
+4 N**S -> X 5
+#lefthand on wall
+5 **xS -> W 5
+5 ***x -> S 6
+5 x*WS -> N 7
+5 N*WS -> E 8
+#6 *E*x -> S 6
+6 *ExS -> W 5
+#6 *x** -> E 8
+6 xEWS -> N 7
+#7 x*W* -> N 7
+7 **x* -> W 5
+7 NxW* -> E 8
+7 NEW* -> X 1
+#8 Nx** -> E 8
+#8 NE*x -> S 6
+8 x*** -> N 7
+#8 NE*S -> W 5

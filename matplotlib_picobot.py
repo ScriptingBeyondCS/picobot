@@ -21,7 +21,14 @@ def get_rules(filename):
 ##############################################################
 ##############################################################
 #insert here the name of the file where your rules are written
-rule_list = get_rules('hw0pr4.txt') 
+rule_list = get_rules('hw0pr3.txt') 
+# how to interact:
+#   spacebar: pause/play
+#   r: resets map/picobot
+#   n: steps ("next")
+#   for i in 1:7: moves to map i
+#       (map 1 is the default)
+#   arrow keys: teleports picobot
 ##############################################################
 ##############################################################
 
@@ -35,7 +42,7 @@ class Picobot:
         self.surround = '1111'
         self.rules = []
         self.currentrule = 'none'
-        self.stop = False
+        self.stop = True
         self.labels = []
         self.message = 'none'
     
@@ -54,15 +61,19 @@ class Picobot:
         loc = choice(range(len(notwalls)))
         self.i = notwalls[loc][0]
         self.j = notwalls[loc][1]
+        self.pmap[self.i,self.j] = 2
         
     def update(self, data):
         if self.isFinished() or self.stop:
             cid3 = fig.canvas.mpl_connect('key_press_event', self.on_step)
             cid5 = fig.canvas.mpl_connect('key_press_event', self.on_reset)
+            cid6 = fig.canvas.mpl_connect('key_press_event', self.on_teleport)
             self.getsurr()
             self.create_labels()
-            return [mat]  #don't update if done
+            mat.set_data(self.pmap)
+            return [mat]
         else:
+            self.message = 'none'
             self.picomove()
             self.annotate()
             return [mat]
@@ -79,7 +90,7 @@ class Picobot:
             
             else:
                 self.pmap[self.i, self.j] = -1
-                self.picosubmove()
+                self.picosubmove(self.currentrule[6])
                 self.picostate = rule[7:]
                 mat.set_data(self.pmap)
                 self.create_labels()
@@ -89,13 +100,12 @@ class Picobot:
         self.message = "no rule applies \nstopping..."
         self.create_labels()
 
-    def picosubmove(self):
+    def picosubmove(self, direction):
         """ updates picobot's coordinates based on
             direction specified (unless there is a wall)
         """    
         d = {'N':0, 'E':1, 'W':2, 'S':3}
         d2 = {'N':'north', 'E':'east', 'W':'west', 'S':'south'}
-        direction = self.currentrule[6]
         if direction in 'xX':
             self.pmap[self.i, self.j] = 2
             pass
@@ -306,6 +316,7 @@ class Picobot:
     def on_step(self, event):
         """ goes one step forward
         """
+        self.message = 'none'
         if event.key == 'n':
             self.picomove()
             self.annotate()
@@ -322,9 +333,26 @@ class Picobot:
             squares to unvisited, and moves 
             picobot to a nonwall location
         """
+        self.message = 'none'
         if event.key == 'r':
             self.reset()
-
+    
+    def on_teleport(self, event):
+        """ teleports picobot in
+            direction suggested, 
+            unless there exists a wall
+        """
+        self.message = 'none'
+        self.getsurr()
+        d = {'up':[0,'N','north'], 'right':[1,'E','east'], 'left':[2,'W','west'], 'down':[3,'S','south']}
+        if event.key in d:
+            if self.surround[d[event.key][0]] == '0':
+                self.message = "wall to the %s\nnot moving robot" % d[event.key][2]
+            else:
+                self.unvisit()
+                self.picosubmove(d[event.key][1])
+                self.annotate()
+        
 picosim = Picobot()
 
 def rule_converter(rule):

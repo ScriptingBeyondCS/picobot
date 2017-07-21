@@ -1,0 +1,20 @@
+#go N if state 0 and N empty
+0 x*** -> N 0
+
+#go W if state 0 and N walled, W empty
+0 N*x* -> W 1
+
+#go E if state 0 and N, W walled
+0 N*W* -> E 2
+
+#go E if state 2 and N walled, E empty
+2 Nx** -> E 2
+
+#go S if state 2 and N, E walled
+2 NE** -> S 1
+
+#go S if state 1 and S empty
+1 ***x -> S 1
+
+#stay if state 1 and S walled
+1 ***S -> x 0

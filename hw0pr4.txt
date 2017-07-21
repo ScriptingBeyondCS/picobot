@@ -1,0 +1,25 @@
+#keep left hand on wall
+
+#facing N
+0 x*W* -> N 0
+0 **x* -> W 2
+0 NxW* -> E 1
+0 NEW* -> S 3
+
+#facing E
+1 Nx** -> E 1
+1 NE*x -> S 3
+1 x*** -> N 0
+1 NE*S -> W 2
+
+#facing W
+2 **xS -> W 2
+2 ***x -> S 3
+2 x*WS -> N 0
+2 N*WS -> E 1
+
+#facing S
+3 *E*x -> S 3
+3 *ExS -> W 2
+3 *x** -> E 1
+3 xEWS -> N 0
