@@ -52,7 +52,7 @@ class Picobot:
 
     def place_picobot(self):
         """ randomly places picobot in
-        a valid (nonwall) location
+            a valid (nonwall) location
         """
         # all walls are represented by zero
         # so places that are not zero are not a wall
@@ -64,38 +64,52 @@ class Picobot:
         self.pmap[self.i,self.j] = 2
         
     def update(self, data):
+        """ wrapper update function
+            called by funcAnimation
+        """
+        #check if paused
         if self.isFinished() or self.stop:
+            #listen for reset/step/teleports
             cid3 = fig.canvas.mpl_connect('key_press_event', self.on_step)
             cid5 = fig.canvas.mpl_connect('key_press_event', self.on_reset)
             cid6 = fig.canvas.mpl_connect('key_press_event', self.on_teleport)
+            #update labels, map if anything's changed
             self.getsurr()
             self.create_labels()
             mat.set_data(self.pmap)
             return [mat]
-        else:
+        else: # call to move if not paused
             self.message = 'none'
             self.picomove()
             self.annotate()
             return [mat]
     
     def picomove(self):
+        """ wrapper move function;
+            goes through rules in order
+        """
         for rule in self.rules:
             self.currentrule = rule
+            # check if rule matches current state and surroundings
             if self.picostate != rule[:2]:
                 continue
 
             self.getsurr()
             if not self.checksurr():
                 continue
-            
+            # update according to rule's directions
             else:
+                #set old position to visited
                 self.pmap[self.i, self.j] = -1
+                #call submove with direction to move
                 self.picosubmove(self.currentrule[6])
+                #set new state
                 self.picostate = rule[7:]
+                #update map, labels
                 mat.set_data(self.pmap)
                 self.create_labels()
                 return [mat]
-        
+        #if no rule matches, pause and say why
         self.stop = True
         self.message = "no rule applies \nstopping..."
         self.create_labels()
@@ -104,22 +118,30 @@ class Picobot:
         """ updates picobot's coordinates based on
             direction specified (unless there is a wall)
         """    
-        d = {'N':0, 'E':1, 'W':2, 'S':3}
-        d2 = {'N':'north', 'E':'east', 'W':'west', 'S':'south'}
+        d = {'N':[0,'north'], 'E':[1,'east'], 'W':[2,'west'], 'S':[3,'south']}
         if direction in 'xX':
             self.pmap[self.i, self.j] = 2
             pass
         else:
-            index = d[direction]
+            index = d[direction][0]
+            #check if there's a wall, refuse if appropriate
             if self.surround[index] == '0':
                 self.stop = True
                 self.pmap[self.i, self.j] = 2
-                self.message = "can't move %s \nstopping..." % d2[direction]
+                self.message = "can't move %s \nstopping..." % d[direction][1]
                 self.create_labels()
             elif direction not in 'NEWS':
+############################################################
+############################################################
+############################################################
+############################################################
+############################################################
+############################################################
+                #shouldn't need this with the parser???
+############################################################
                 self.stop = True
                 raise Exception('direction not understood')
-            else:
+            else: #move in specified direction
                 if direction == 'N':
                     self.i -= 1
                 elif direction == 'E':
@@ -128,6 +150,7 @@ class Picobot:
                     self.j -= 1
                 else:
                     self.i += 1
+                #update color of picobot's location
                 self.pmap[self.i, self.j] = 2
     
     def getsurr(self):
@@ -135,12 +158,16 @@ class Picobot:
             NEWS form, with 1 == open and 0 == wall
         """
         out = ''
+        # check north - if at top, there's a wall
         if self.i == 0: out += '0'
         else: out += str(self.pmap[self.i-1, self.j]%2)
+        # check east - if we get an error with index, there's a wall
         try: out += str(self.pmap[self.i, self.j+1]%2)
         except: out += '0'
+        # check west - if all the way left, there's a wall
         if j == 0: out += '0'
         else: out += str(self.pmap[self.i, self.j-1]%2)
+        # check south - if we get error with index, there's a wall
         try: out += str(self.pmap[self.i+1, self.j]%2)
         except: out += '0'
         
@@ -151,11 +178,14 @@ class Picobot:
             (nonwall) squares picobot has not 
             visited; returns True otherwise
         """
+        # change ndarray to list of lists
         grid = self.pmap.tolist()
+        # loop over lists looking for unvisited
         for k in range(len(grid)):
             for l in range(len(grid[k])):
                 if grid[k][l] == 1:
                     return False
+        # congratulate if done
         self.message = "map complete!"
         return True
     
@@ -166,23 +196,31 @@ class Picobot:
         """
         rule = self.currentrule
         for k in range(4):
-            if rule[k+2] + self.surround[k] == '01' or rule[k+2] + self.surround[k] == '10':
+            # if direct conflicts between rule/surround 
+            # say it doesn't match
+            if rule[k+2] + self.surround[k] == '01' or \
+                    rule[k+2] + self.surround[k] == '10':
                 return False
         return True
     
     def reset(self, given_map=None):
         """ resets board
         """
+        #pause
         self.stop = True
+        #unvisit all visited cells
         self.unvisit()
+        #set picostate to default
         self.picostate = '00'
+        #check if we're passed a map
         if type(given_map) == type(None):
             self.pmap[self.i, self.j] = 1
-        else:
+        else: #(to prevent holes from appearing)
             self.pmap[self.i, self.j] = given_map[self.i, self.j]
-        
+        #put picobot somewhere
         self.place_picobot()
         self.pmap[self.i, self.j] = 2
+        #update image, message, labels
         mat.set_data(self.pmap)
         self.message = 'none'
         self.create_labels()
@@ -194,7 +232,9 @@ class Picobot:
         """ resets all visited cells
             to unvisited state
         """
+        #change ndarray to list of lists
         grid = self.pmap.tolist()
+        # loop over lists to change back all visited cells
         for k in range(len(grid)):
             for l in range(len(grid[k])):
                 if grid[k][l] != 0:
@@ -205,8 +245,10 @@ class Picobot:
         """ returns number of
             unvisited cells
         """
+        #change ndarray to list of lists
         grid = self.pmap.tolist()
         count = 0
+        #loop over lists looking for unvisited cells
         for k in range(len(grid)):
             for l in range(len(grid[j])):
                 if grid[k][l] == 1:
@@ -219,7 +261,8 @@ class Picobot:
             gives the position of the upper left
             corner of the label.
         """
-        anchored_label = AnchoredText(s=text, loc=2, pad=.3, bbox_to_anchor=location, bbox_transform=ax.transAxes,)
+        anchored_label = AnchoredText(s=text, loc=2, pad=.3, \
+                bbox_to_anchor=location, bbox_transform=ax.transAxes,)
         return anchored_label
     
     def create_labels(self):
@@ -227,15 +270,16 @@ class Picobot:
             surroundings, remaining cells,
             and current rule
         """
+        #take off old labels
         for label in self.labels:
               label.remove()
-        
+        #make and place all labels
         state_label = self.make_label("State: %s" % self.picostate, (1,1))
         surr_label = self.make_label("Surroundings: %s" % self.surr_deconverter(self.surround), (.6,0))
         cells_label = self.make_label("Cells to go: %s" % str(self.countUnvisited()), (1, .8))
         rule_label = self.make_label("Current rule: %s" % self.rule_deconverter(self.currentrule), (0,0))
         message_label = self.make_label("Messages: \n%s" % self.message, (1, .6))
-        
+        #set all labels and add them to the plot
         self.labels = [state_label, surr_label, cells_label, rule_label, message_label]
         for label in self.labels:
             ax.add_artist(label)
@@ -249,8 +293,10 @@ class Picobot:
             return rule
         else:
             out = ''
+            #add state
             out += rule[:2]
             out += ' '
+            #add surroundings
             for i in range(4):
                 if rule[i+2] == '*':
                     out += rule[i+2]
@@ -259,8 +305,10 @@ class Picobot:
                 elif rule[i+2] == '1':
                     out += 'X'
             out += ' -> '
+            #add direction
             out += rule[6]
             out += ' '
+            #add newstate
             out += rule[7:]
             return out
     
@@ -288,14 +336,19 @@ class Picobot:
             and resets all visited cells to unvisited
             (not necessarily in that order)     
         """
+        #reset all visited cells
         self.unvisit()
+        #replace picobot
         self.pmap[self.i, self.j] = 2
+        #get location of click
         col = int(np.round(event.xdata))
         row = int(np.round(event.ydata))
+        #flip from wall to nonwall
         if self.pmap[row,col] == 0:
             self.pmap[row,col] = 1
-        else:
+        else:# flip to wall
             self.pmap[row,col] = 0
+        #update plot, messages, labels, etc
         mat.set_data(self.pmap)
         self.message = 'none'
         self.create_labels()
@@ -310,6 +363,7 @@ class Picobot:
             self.stop = True
             index = int(event.key)
             self.pmap = map_options[index]
+            #get new map and put picobot somewhere
             self.reset(given_map=map_options[index])
             return [mat]
     
@@ -318,6 +372,7 @@ class Picobot:
         """
         self.message = 'none'
         if event.key == 'n':
+            #do next move
             self.picomove()
             self.annotate()
     
@@ -335,6 +390,7 @@ class Picobot:
         """
         self.message = 'none'
         if event.key == 'r':
+            #just call the reset function
             self.reset()
     
     def on_teleport(self, event):
@@ -342,19 +398,24 @@ class Picobot:
             direction suggested, 
             unless there exists a wall
         """
-        self.message = 'none'
-        self.getsurr()
         d = {'up':[0,'N','north'], 'right':[1,'E','east'], 'left':[2,'W','west'], 'down':[3,'S','south']}
+        self.message = 'none'
+        #update self.surround
+        self.getsurr()
         if event.key in d:
+            self.unvisit()
+            #check if there's a wall and refuse to move if appropriate
             if self.surround[d[event.key][0]] == '0':
                 self.message = "wall to the %s\nnot moving robot" % d[event.key][2]
-            else:
-                self.unvisit()
+            else: # teleport appropriately
                 self.picosubmove(d[event.key][1])
                 self.annotate()
-        
+
+# instantiate the class        
 picosim = Picobot()
 
+#working on obsoletifying this function
+#so im not gonna comment it for now
 def rule_converter(rule):
     """ converts old-style rules 
         into nine character string 
@@ -380,8 +441,9 @@ def rule_converter(rule):
     out += newstate
     return out
 
-
+# put picobot somewhere nice
 picosim.place_picobot()
+#set up rules (a hopefully soon obsolete step)
 picosim.rules = [rule_converter(rule) for rule in rule_list]
 
 #set colors to values in picomap
@@ -391,14 +453,16 @@ norm = colors.BoundaryNorm(bounds, cmap.N)
 
 #show animation!!
 fig, ax = plt.subplots()
-
+#listen for clicks, pauses, map changes, resets
 cid = fig.canvas.mpl_connect('button_press_event', picosim.on_click)
 cid2 = fig.canvas.mpl_connect('key_press_event', picosim.on_keypress)
 cid4 = fig.canvas.mpl_connect('key_press_event', picosim.on_space)
 cid5 = fig.canvas.mpl_connect('key_press_event', picosim.on_reset)
 
-
+#set up plot
 mat = ax.matshow(picosim.pmap, cmap=cmap, norm=norm)
+#get first picobot state label
 annotation = plt.annotate(picosim.picostate, xy=[picosim.j-.6, picosim.i+.4])
+#let the show begin!!
 ani = animation.FuncAnimation(fig, picosim.update, interval=50, save_count=50, blit=False)
-plt.show()    
+plt.show()
