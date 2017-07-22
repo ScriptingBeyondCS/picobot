@@ -5,23 +5,13 @@ from matplotlib.offsetbox import AnchoredText
 from matplotlib import colors
 from random import choice
 
+from rule_conversion import get_rules
 from maps import *
-
-def get_rules(filename):
-    f = open(filename)
-    lines = f.readlines()
-    rules_list = []
-    for line in lines:
-        if line[0] in '0123456789':
-            line = line.rstrip()
-            rules_list += [line]
-    f.close()
-    return rules_list
 
 ##############################################################
 ##############################################################
 #insert here the name of the file where your rules are written
-rule_list = get_rules('hw0pr3.txt') 
+rule_list = get_rules('diamondrules.txt') 
 # how to interact:
 #   spacebar: pause/play
 #   r: resets map/picobot
@@ -130,17 +120,6 @@ class Picobot:
                 self.pmap[self.i, self.j] = 2
                 self.message = "can't move %s \nstopping..." % d[direction][1]
                 self.create_labels()
-            elif direction not in 'NEWS':
-############################################################
-############################################################
-############################################################
-############################################################
-############################################################
-############################################################
-                #shouldn't need this with the parser???
-############################################################
-                self.stop = True
-                raise Exception('direction not understood')
             else: #move in specified direction
                 if direction == 'N':
                     self.i -= 1
@@ -265,14 +244,15 @@ class Picobot:
                 bbox_to_anchor=location, bbox_transform=ax.transAxes,)
         return anchored_label
     
-    def create_labels(self):
+    def create_labels(self, init=False):
         """ creates labels for state, 
             surroundings, remaining cells,
             and current rule
         """
         #take off old labels
-        for label in self.labels:
-              label.remove()
+        if not init:
+            for label in self.labels:
+                label.remove()
         #make and place all labels
         state_label = self.make_label("State: %s" % self.picostate, (1,1))
         surr_label = self.make_label("Surroundings: %s" % self.surr_deconverter(self.surround), (.6,0))
@@ -414,37 +394,10 @@ class Picobot:
 # instantiate the class        
 picosim = Picobot()
 
-#working on obsoletifying this function
-#so im not gonna comment it for now
-def rule_converter(rule):
-    """ converts old-style rules 
-        into nine character string 
-        used by matplotlib program
-    """
-    out = ''
-    rule = rule.split(' ')
-    state = '0'*(2-len(rule[0])) + rule[0]
-    out += state
-    surr = ''
-    for i in range(4):
-        if rule[1][i] == '*':
-            surr += rule[1][i]
-        elif rule[1][i] in 'xX':
-            surr += '1'
-        elif rule[1][i] in 'NEWS':
-            surr += '0'
-        else:
-            raise Exception("surrounding not recognized")
-    out += surr
-    out += rule[3]
-    newstate = '0'*(2-len(rule[4])) + rule[4]
-    out += newstate
-    return out
-
 # put picobot somewhere nice
 picosim.place_picobot()
-#set up rules (a hopefully soon obsolete step)
-picosim.rules = [rule_converter(rule) for rule in rule_list]
+#set up rules 
+picosim.rules = rule_list 
 
 #set colors to values in picomap
 cmap = colors.ListedColormap(['#808080','blue','white','xkcd:electric green'])
@@ -463,6 +416,6 @@ cid5 = fig.canvas.mpl_connect('key_press_event', picosim.on_reset)
 mat = ax.matshow(picosim.pmap, cmap=cmap, norm=norm)
 #get first picobot state label
 annotation = plt.annotate(picosim.picostate, xy=[picosim.j-.6, picosim.i+.4])
-#let the show begin!!
+#let the show begin!
 ani = animation.FuncAnimation(fig, picosim.update, interval=50, save_count=50, blit=False)
-plt.show()
+plt.show()    
