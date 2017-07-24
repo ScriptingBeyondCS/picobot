@@ -1,3 +1,7 @@
+##############################################################
+# by Hanna Hoffman, HMC '20: Summer 2017
+##############################################################
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -15,7 +19,7 @@ rule_list = get_rules('diamondrules.txt')
 # how to interact:
 #   spacebar: pause/play
 #   r: resets map/picobot
-#   n: steps ("next")
+#   n: steps forward ("next")
 #   for i in 1:7: moves to map i
 #       (map 1 is the default)
 #   arrow keys: teleports picobot
