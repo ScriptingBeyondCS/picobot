@@ -8,4 +8,9 @@ This set of programs (excluding the rules, which are written in Picobot) is writ
 
 ## How to Run Picobot
 
-In picobot.py, there is a place to add the filename where your rules are written (it should have a default set already there). Then go to a terminal, cd into the directory where this group of files and your rules are saved, and run picobot.py with the command `python3 picobot.py`. To play/unpause, press the spacebar. To reset the map and picobot, press 'r'. To step forward, press 'n' (for 'next'). To change the map, press a number key 1-7. Map 1 is the default map. Map 2 is a maze, map 3 is a diamond, and maps 4 through 7 are increasingly complex to solve. You can teleport picobot by pressing arrow keys.
+In picobot.py, there is a place to add the filename where your rules are written (it should have a default set already there). Then go to a terminal, cd into the directory where this group of files and your rules are saved, and run picobot.py with the command `python3 picobot.py`. 
+- To play/unpause, press the spacebar. 
+- To reset the map and picobot, press 'r'. 
+- To step forward, press 'n' (for 'next'). 
+- To change the map, press a number key 1-7. Map 1 is the default map. Map 2 is a maze, map 3 is a diamond, and maps 4 through 7 are increasingly complex to solve. 
+- You can teleport picobot by pressing arrow keys.
