@@ -1,7 +1,6 @@
 ##############################################################
 # by Hanna Hoffman, HMC '20: Summer 2017
 ##############################################################
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -15,7 +14,7 @@ from maps import *
 ##############################################################
 ##############################################################
 #insert here the name of the file where your rules are written
-rule_list = get_rules('diamondrules.txt') 
+rule_list = get_rules('hw0pr3.txt') 
 # how to interact:
 #   spacebar: pause/play
 #   r: resets map/picobot
