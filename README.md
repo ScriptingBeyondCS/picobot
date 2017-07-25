@@ -4,7 +4,7 @@ This repo contains a visualizer, three sets of rules, a set of maps, and a rule 
 
 ## Dependencies
 
-This set of programs (excluding the rules, which are written in Picobot) is written in Python 3, and also requires the matplotlib and numpy libraries.
+This set of programs (excluding the rules, which are written in Picobot) is written in Python 3, and also requires the matplotlib and numpy libraries (both of which come with the Anaconda installation, I believe).
 
 ## How to Run Picobot
 
