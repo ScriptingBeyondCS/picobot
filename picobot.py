@@ -8,7 +8,7 @@ from matplotlib.offsetbox import AnchoredText
 from matplotlib import colors
 from random import choice
 
-from rule_conversion import get_rules
+from rule_compiler import get_rules
 from maps import *
 
 ##############################################################
@@ -421,4 +421,5 @@ mat = ax.matshow(picosim.pmap, cmap=cmap, norm=norm)
 annotation = plt.annotate(picosim.picostate, xy=[picosim.j-.6, picosim.i+.4])
 #let the show begin!
 ani = animation.FuncAnimation(fig, picosim.update, interval=50, save_count=50, blit=False)
+plt.axis('off')
 plt.show()
