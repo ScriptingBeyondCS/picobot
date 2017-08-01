@@ -14,7 +14,7 @@ from maps import *
 ##############################################################
 ##############################################################
 #insert here the name of the file where your rules are written
-rule_list = get_rules('hw0pr3.txt') 
+rule_list = get_rules('default_rules.txt') 
 # how to interact:
 #   spacebar: pause/play
 #   r: resets map/picobot
@@ -421,4 +421,4 @@ mat = ax.matshow(picosim.pmap, cmap=cmap, norm=norm)
 annotation = plt.annotate(picosim.picostate, xy=[picosim.j-.6, picosim.i+.4])
 #let the show begin!
 ani = animation.FuncAnimation(fig, picosim.update, interval=50, save_count=50, blit=False)
-plt.show()    
+plt.show()
